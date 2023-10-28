@@ -1,0 +1,16 @@
+
+.datatable {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+
+    .datatable th, td {
+        border: 1px solid #cbcbcb;
+        padding: 15px;
+    }
+
+th {
+    background-color: #f8f8f8;
+    font-weight: bold;
+}

@@ -1,0 +1,60 @@
+﻿<div class="modal fade" id="newCategoryModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Yeni Kategori</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label for="categoryName">Kategori Adı</label>
+                    <input name="categoryName" type="text" class="form-control">
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="createNewCategory();">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $newCategoryModal = $("#newCategoryModal");
+
+    $('#newCategoryModal').on('shown.bs.modal', function () {
+        //Modal her açıldığında tetiklenir
+        $newCategoryModal.find("input[name='categoryName']").val("");
+        $newCategoryModal.find("input[name='categoryName']").trigger('focus');
+    });
+
+    function createNewCategory() {
+        showModalLoading("newCategoryModal");
+        //create api'si çağırılacak
+        $.ajax({
+            url: portalApiEndpoint + '/geek-yapar-api/categories',
+            type: 'POST',
+            complete: function () {
+                hideModalLoading("newCategoryModal");
+            },
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                name: $newCategoryModal.find("input[name='categoryName']").val()
+            }),
+            success: function () {
+                $('#newCategoryModal').modal('hide');// modal'ı kapat
+                notify("", "Kategori başarıyla oluşturuldu.", "success");
+                getCategories();
+            },
+            error: function (xhr, status, error) {
+                var errorMessage = xhr.responseJSON.ErrorMessage;
+                notify("", errorMessage, "error");
+            }
+        });
+    }
+</script>

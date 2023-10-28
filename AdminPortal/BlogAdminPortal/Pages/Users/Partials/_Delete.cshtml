@@ -1,0 +1,49 @@
+﻿<div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Delete User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-message">Bu kullanıcıyı silmek istediğinize emin misiniz?</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hayır</button>
+                <button type="button" class="btn btn-danger" onclick="deleteUser();">Evet Eminim.</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    $deleteUserModal = $("#deleteUserModal");
+    var selectedUserId;
+
+    $deleteUserModal.on('shown.bs.modal', function (event) {
+        selectedUserId = $(event.relatedTarget).data('id'); //Tıklanan satırın id'sini oku
+    });
+
+    function deleteUser() {
+        showModalLoading("deleteUserModal");
+        $.ajax({
+            url: portalApiEndpoint + '/iam/users/' + selectedUserId,
+            type: 'DELETE',
+            complete: function () {
+                hideModalLoading("deleteUserModal");
+            },
+            contentType: 'application/json; charset=utf-8',
+            success: function () {
+                $('#deleteUserModal').modal('hide');
+                notify("", "Kullanıcı başarıyla silindi.", "success");
+                getUsers();
+            },
+            error: function (err, status, xhr) {
+                var errorMessage = xhr.responseJSON.ErrorMessage;
+                notify("", errorMessage, "error");
+            }
+        });
+    }
+</script>

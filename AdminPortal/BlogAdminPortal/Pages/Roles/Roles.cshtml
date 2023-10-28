@@ -1,0 +1,36 @@
+﻿@page "/roles"
+@model BlogAdminPortal.Pages.Roles.RolesModel
+
+<link rel="stylesheet" href="~/css/roles.css" />
+
+<div class="pageTitle"> Role <button type="button" class="btn btn-primary new" data-toggle="modal" data-target="#newRoleModal">Yeni Role Ekle</button></div>
+
+<div class="datatable">
+    <table id="roles" cellpadding="0" cellspacing="0" class="datatable">
+        <thead>
+            <tr>
+                <th>Adı</th>
+                <th style="width:75px;"></th>
+            </tr>
+
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<template id="roleTemplate">
+    <tr>
+        <td>#RoleName#</td>
+        <td style="width:165px;">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editRoleModal" data-id="#Id#">Düzenle</button>
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteRoleModal" data-id="#Id#">Sil</button>
+        </td>
+    </tr>
+</template>
+
+<partial name="Partials/_New" />
+<partial name="Partials/_Edit" />
+<partial name="Partials/_Delete" />
+
+<script src="~/js/roles.js"></script>

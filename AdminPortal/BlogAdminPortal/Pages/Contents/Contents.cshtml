@@ -1,0 +1,47 @@
+﻿@page "/contents"
+@model BlogAdminPortal.Pages.Contents.ContentsModel
+
+
+<div class="pageTitle">Content <button type="button" class="btn btn-primary new" data-toggle="modal" data-target="#newContentModal">Yeni Content Ekle</button></div>
+
+<div class="datatable">
+    <table id="contents" cellpadding="0" cellspacing="0" class="datatable">
+        <thead>
+            <tr>
+                <th>Adı</th>
+                <th>Yazarı</th>
+                <th style="width:75px;"></th>
+            </tr>
+        @*    <tr>
+                <td>Yüzüklerin Efendisi</td>
+                <td>Onur</td>
+                <td>Film</td>
+                <td style="width:165px;">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editCategoryModal" data-id="#Id#">Düzenle</button>
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteCategoryModal" data-id="#Id#">Sil</button>
+                </td>
+            </tr>*@
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+
+<template id="contentTemplate">
+    <tr>
+        <td>#ContentName#</td>
+        <td>#ContentAuthor#</td>
+        <td style="width:165px;">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editContentModal" data-id="#Id#">Düzenle</button>
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteContentModal" data-id="#Id#">Sil</button>
+        </td>
+    </tr>
+
+</template>
+
+
+<partial name="Partials/_New" />
+<partial name="Partials/_Edit" />
+<partial name="Partials/_Delete" />
+<script src="~/js/contents.js"></script>

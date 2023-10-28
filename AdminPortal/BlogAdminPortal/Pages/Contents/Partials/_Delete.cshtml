@@ -1,0 +1,53 @@
+﻿<div class="modal fade" id="deleteContentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Delete Content</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-message">Bu rolü silmek istediğinize emin misiniz?</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hayır</button>
+                <button type="button" class="btn btn-danger" onclick="deleteContent();">Evet Eminim.</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    $deleteContentModal = $("#deleteContentModal");
+    var selectedContentId;
+
+    $deleteContentModal.on('shown.bs.modal', function (event) {
+
+        selectedContentId = $(event.relatedTarget).data('id'); //Tıklanan satırın id'sini oku
+    });
+
+    function deleteContent() {
+        showModalLoading("deleteContentModal");
+        $.ajax({
+            url: portalApiEndpoint + '/geek-yapar-api/contents/' + selectedContentId,
+            type: 'DELETE',
+            complete: function () {
+                hideModalLoading("deleteContentModal");
+            },
+            contentType: 'application/json; charset=utf-8',
+            success: function () {
+                $('#deleteContentModal').modal('hide');// modal'ı kapat
+                notify("", "İçerik başarıyla silindi.", "success");
+                getContents();
+            },
+            error: function (xhr, status, error) {
+                var errorMessage = xhr.responseJSON.ErrorMessage;
+                notify("", errorMessage, "error");
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,83 @@
+﻿<div class="modal fade" id="newUserModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Yeni Kullanıcı</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label for="firstName">Adı</label>
+                    <input name="firstName" type="text" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Soyadı</label>
+                    <input name="lastName" type="text" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="userName">Kullanıcı Adı</label>
+                    <input name="userName" type="text" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input name="email" type="text" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input name="password" type="password" class="form-control">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="createNewUser();">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $newUserModal = $("#newUserModal");
+
+    $('#newUserModal').on('shown.bs.modal', function () {
+        //Modal her açıldığında tetiklenir
+        $newUserModal.find("input[name='firstName']").val("");
+        $newUserModal.find("input[name='lastName']").val("");
+        $newUserModal.find("input[name='userName']").val("");
+        $newUserModal.find("input[name='email']").val("");
+        $newUserModal.find("input[name='password']").val("");
+        $newUserModal.find("input[name='firstName']").trigger('focus');
+    });
+    function createNewUser() {
+        showModalLoading("newUserModal");
+        $.ajax({
+            url: portalApiEndpoint + '/iam/users',
+            type: 'POST',
+            complete:function(){
+                hideModalLoading("newUserModal");
+            },
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                firstName: $newUserModal.find("input[name='firstName']").val(),
+                lastName: $newUserModal.find("input[name='lastName']").val(),
+                userName: $newUserModal.find("input[name='userName']").val(),
+                email: $newUserModal.find("input[name='email']").val(),
+                password: $newUserModal.find("input[name='password']").val()
+            }),
+            success: function () {
+                $('#newUserModal').modal('hide');
+                notify("", "Kullanıcı başarıyla oluşturuldu.", "success");
+                getUsers();
+            },
+            error: function (err, xhr, status) {
+                var errorMessage = xhr.responseJSON.ErrorMessage;
+                notify("", errorMessage, "error");
+            }
+        });
+    }
+
+
+</script>

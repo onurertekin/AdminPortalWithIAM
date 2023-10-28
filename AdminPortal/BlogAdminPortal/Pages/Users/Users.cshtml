@@ -1,0 +1,42 @@
+﻿@page "/users"
+@model BlogAdminPortal.Pages.Users.UsersModel
+
+<link rel="stylesheet" href="~/css/categories.css" />
+
+<div class="pageTitle">Kullanıcılar <button type="button" class="btn btn-primary new" data-toggle="modal" data-target="#newUserModal">Yeni Kullanıcı Ekle</button></div>
+
+<div class="datatable">
+    <table id="users" cellpadding="0" cellspacing="0" class="datatable">
+        <thead>
+            <tr>
+                <th>Adı</th>
+                <th>Soyadı</th>
+                <th>Kullanıcı Adı</th>
+                <th>Email</th>
+                <th style="width:75px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<template id="userTemplate">
+    <tr>
+        <td>#UserFirstName#</td>
+        <td>#UserSurname#</td>
+        <td>#UserName#</td>
+        <td>#UserEmail#</td>
+        <td style="width:280px;">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editUserRolesModal" data-id="#Id#">Rolleri Yönet</button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editUserModal" data-id="#Id#">Düzenle</button>
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteUserModal" data-id="#Id#">Sil</button>
+        </td>
+    </tr>
+</template>
+
+<partial name="Partials/_New" />
+<partial name="Partials/_Edit" />
+<partial name="Partials/_Delete" />
+<partial name="Partials/_UserRoles" />
+<script src="~/js/users.js"></script>

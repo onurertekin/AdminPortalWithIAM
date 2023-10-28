@@ -1,0 +1,112 @@
+﻿<div class="modal fade" id="editUserRolesModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Edit User Roles</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group" id="roleList">
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="editUserRoles();">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<template id="userRolesCheckboxTemplate">
+    <div class="form-check">
+        <input id="#LabelFor#" type="checkbox" value="#Id#" class="form-check-input">
+        <label class="form-check-label" for="#LabelFor#">#Name#</label>
+    </div>
+</template>
+
+<script>
+    $editUserRolesModal = $("#editUserRolesModal");
+
+    var selectedUserId;
+
+    $('#editUserRolesModal').on('show.bs.modal', function (event) {
+        //Modal her açıldığında tetiklenir
+        showModalLoading("editUserRolesModal");
+        selectedUserId = $(event.relatedTarget).data('id');
+        $("#editUserRolesModal #roleList").empty();
+        _getRoles();
+
+    });
+
+    function _getRoles() {
+        $.get(portalApiEndpoint + '/iam/roles', function (response) {
+
+            $(response.roles).each(function (i, role) {
+
+                var template = $("#userRolesCheckboxTemplate").html();
+                template = template.replace("#Id#", role.id);
+                template = template.replace("#LabelFor#", role.id);
+                template = template.replace("#LabelFor#", role.id);
+                template = template.replace("#Name#", role.name);
+                $("#editUserRolesModal #roleList").append(template);
+            });
+
+            getUserRole();
+        });
+    }
+
+    function getUserRole() {
+
+        $.ajax({
+            url: portalApiEndpoint + '/iam/users/' + selectedUserId + '/roles',
+            type: 'GET',
+            complete: function () {
+                hideModalLoading("editUserRolesModal");
+            },
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                //response'taki roles listesindeki her bir role'de dolaşıyoruz.
+                $(response.roles).each(function (i, role) {
+                    //ilgili rolün checkbox'ını işaretliyoruz.
+                    $("#editUserRolesModal #roleList input[value='" + role.id + "']").prop("checked", true);
+                });
+            },
+            error: function (err, xhr, status) {
+                alert("Hata Oluştu.");
+            }
+        });
+    }
+
+    function editUserRoles() {
+
+        var _selectedClaims = [];
+        showModalLoading("editUserRolesModal");
+        $("#editUserRolesModal").find("input:checked").each(function (i, roleCheckbox) {
+            _selectedClaims.push($(roleCheckbox).val());
+        });
+
+        $.ajax({
+            url: portalApiEndpoint + '/iam/users/' + selectedUserId + '/roles',
+            type: 'PUT',
+            complete: function () {
+                hideModalLoading("editUserRolesModal");
+            },
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                "roles": _selectedClaims
+            }),
+            success: function () {
+                $('#editUserRolesModal').modal('hide');
+                notify("", "Roller başarıyla güncellendi.", "success");
+            },
+            error: function (err, status, xhr) {
+                var errorMessage = xhr.responseJSON.ErrorMessage;
+                notify("", errorMessage, "error");
+            }
+        });
+    }
+</script>

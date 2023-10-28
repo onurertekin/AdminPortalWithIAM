@@ -1,0 +1,52 @@
+﻿<div class="modal fade" id="deleteRoleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Delete Roles</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-message">Bu rolü silmek istediğinize emin misiniz?</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hayır</button>
+                <button type="button" class="btn btn-danger" onclick="deleteRole();">Evet Eminim.</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $deleteRoleModal = $("#deleteRoleModal");
+    var selectedRoleId;
+
+    $deleteRoleModal.on('shown.bs.modal', function (event) {
+        //Modal her açıldığında tetiklenir
+        selectedRoleId = $(event.relatedTarget).data('id'); //Tıklanan satırın id'sini oku
+    });
+
+    function deleteRole() {
+
+        showModalLoading("deleteRoleModal");
+        $.ajax({
+            url: portalApiEndpoint + '/iam/roles/' + selectedRoleId,
+            type: 'DELETE',
+            complete:function(){
+                hideModalLoading("deleteRoleModal");
+            },
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                $('#deleteRoleModal').modal('hide');
+                notify("", "Rol başarıyla silindi.", "success");
+                getRoles();
+            },
+            error: function (xhr, status, err) {
+                var errorMessage = xhr.responseJSON.ErrorMessage;
+                notify("", errorMessage, "error");
+            }
+        });
+    }
+</script>

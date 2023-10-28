@@ -1,0 +1,53 @@
+﻿<div class="modal fade" id="deleteCategoryModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Delete Kategori</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+              <div class="modal-body">
+              <div class="confirmation-message">Bu kategoriyi silmek istediğinize emin misiniz?</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hayır</button>
+                <button type="button" class="btn btn-danger" onclick="deleteCategory();">Evet Eminim.</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $deleteCategoryModal = $("#deleteCategoryModal");
+    var selectedCategoryId;
+
+    $deleteCategoryModal.on('shown.bs.modal', function (event) {
+        //Modal her açıldığında tetiklenir
+        selectedCategoryId = $(event.relatedTarget).data('id'); //Tıklanan satırın id'sini oku
+    });
+
+    function deleteCategory() {
+        showModalLoading("deleteCategoryModal");
+        $.ajax({
+            url: portalApiEndpoint + '/geek-yapar-api/categories/' + selectedCategoryId,
+            type: 'DELETE',
+            complete: function () {
+                hideModalLoading("deleteCategoryModal");
+            },
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                // Silme işlemi başarılı olduğunda burada gerekli işlemleri yapabilirsiniz.
+                $('#deleteCategoryModal').modal('hide');// modal'ı kapat
+                notify("", "Kategori başarıyla silindi.", "success");
+                getCategories();
+            },
+            error: function (xhr, status, error) {
+                // Silme işlemi sırasında hata oluştuğunda burada gerekli işlemleri yapabilirsiniz.
+                var errorMessage = xhr.responseJSON.ErrorMessage;
+                notify("", errorMessage, "error");
+            }
+        });
+    }
+</script>

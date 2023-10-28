@@ -1,0 +1,99 @@
+﻿<div class="modal fade" id="newRoleModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Yeni Role</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label for="roleName">Role Adı</label>
+                    <input name="roleName" type="text" class="form-control">
+                </div>
+
+                <div class="form-group" id="claimList">
+                    <!-- Claims buraya eklenecek -->
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="createNewRole();">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<template id="claimCheckboxTemplate">
+    <div class="form-check">
+        <input id="#LabelFor#" type="checkbox" value="#Code#" class="form-check-input">
+        <label class="form-check-label" for="#LabelFor#">#Code#</label>
+    </div>
+</template>
+
+
+<script>
+    $newRoleModal = $("#newRoleModal");
+
+    $('#newRoleModal').on('show.bs.modal', function () {
+        //Modal her açıldığında tetiklenir
+        showModalLoading("newRoleModal");
+
+        $newRoleModal.find("input[name='roleName']").val("");
+        $newRoleModal.find("input[name='roleName']").trigger('focus');
+        getClaims();
+        $("#newRoleModal #claimList").empty(); // Modal her açıldığında ClaimCode ve Checkboxlar altına tekrardan sıralanıyordu. O yüzden boşaltıyoruz.
+    });
+
+    function getClaims() {
+        $.get(portalApiEndpoint + '/iam/claims', function (response) {
+
+            $(response.claims).each(function (i, claim) {
+
+                var template = $("#claimCheckboxTemplate").html();
+                template = template.replace("#Code#", claim.code);
+                template = template.replace("#Code#", claim.code);
+                template = template.replace("#LabelFor#", "New_" + claim.code);
+                template = template.replace("#LabelFor#", "New_" + claim.code);
+                $("#newRoleModal #claimList").append(template);
+            });
+            hideModalLoading("newRoleModal");
+        });
+    }
+
+    function createNewRole() {
+
+        showModalLoading("newRoleModal");
+        var selectedPermissions = [];
+
+        $("#newRoleModal").find("input:checked").each(function (i, ob) {
+            selectedPermissions.push($(ob).val());
+        });
+
+        $.ajax({
+            url: portalApiEndpoint + '/iam/roles',
+            type: 'POST',
+            complete: function () {
+                hideModalLoading("newRoleModal");
+            },
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                name: $newRoleModal.find("input[name='roleName']").val(),
+                claims: selectedPermissions
+            }),
+            success: function () {
+                $('#newRoleModal').modal('hide');
+                notify("", "Rol başarıyla oluşturuldu.", "success");
+                getRoles();
+            },
+            error: function (xhr, status, error) {
+                var errorMessage = xhr.responseJSON.ErrorMessage;
+                notify("", errorMessage, "error");
+            }
+
+        });
+    }
+</script>

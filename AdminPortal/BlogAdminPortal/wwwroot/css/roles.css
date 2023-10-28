@@ -1,0 +1,9 @@
+﻿div#claimList {
+    max-height: 300px;
+    overflow-y: scroll;
+}
+
+.form-check {
+    float: left;
+    width: 200px;
+}

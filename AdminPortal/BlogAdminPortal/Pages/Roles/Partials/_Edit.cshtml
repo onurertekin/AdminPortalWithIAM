@@ -1,0 +1,119 @@
+﻿<div class="modal fade" id="editRoleModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Edit Role</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label for="roleName">Role Adı</label>
+                    <input name="roleName" type="text" class="form-control">
+                </div>
+
+                <div class="form-group" id="claimList">
+                    <!-- Claims buraya eklenecek -->
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="editRole();">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $editRoleModal = $("#editRoleModal");
+
+    var selectedRoleId;
+
+    $('#editRoleModal').on('show.bs.modal', function (event) {
+        //Modal her açıldığında tetiklenir
+        showModalLoading("editRoleModal");
+
+        selectedRoleId = $(event.relatedTarget).data('id'); //Tıklanan satırın id'sini oku
+
+        $editRoleModal.find("input[name='roleName']").val("");
+        $editRoleModal.find("input[name='roleName']").trigger('focus');
+        $("#editRoleModal #claimList").empty(); // Modal her açıldığında ClaimCode ve Checkboxlar altına tekrardan sıralanıyordu. O yüzden boşaltıyoruz.
+        getClaimsForEdit();
+    });
+
+    function getClaimsForEdit() {
+        $.get(portalApiEndpoint + '/iam/claims', function (response) {
+
+            $(response.claims).each(function (i, claim) {
+
+                var template = $("#claimCheckboxTemplate").html();
+                template = template.replace("#Code#", claim.code);
+                template = template.replace("#Code#", claim.code);
+                template = template.replace("#LabelFor#", "Edit_" + claim.code);
+                template = template.replace("#LabelFor#", "Edit_" + claim.code);
+                $("#editRoleModal #claimList").append(template);
+            });
+
+            getRole();
+        });
+    }
+
+    function getRole() {
+
+        $.ajax({
+            url: portalApiEndpoint + '/iam/roles/' + selectedRoleId,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                $editRoleModal.find("input[name='roleName']").val(response.name);
+
+                $(response.claims).each(function (i, claim) {
+                    $("#editRoleModal #claimList input[value=" + claim + "]").prop("checked", true);
+                });
+
+                hideModalLoading("editRoleModal");
+            },
+            error: function (xhr, status, error) {
+                alert("Hata Oluştu!");
+            }
+        });
+    }
+
+    function editRole() {
+
+        showModalLoading("editRoleModal");
+
+        var selectedClaims = [];
+
+        $("#editRoleModal").find("input:checked").each(function (i, claim) {
+            selectedClaims.push($(claim).val());
+        });
+
+        $.ajax({
+            url: portalApiEndpoint + '/iam/roles/' + selectedRoleId,
+            type: 'PUT',
+            complete: function () {
+
+                hideModalLoading("editRoleModal");
+            },
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                name: $editRoleModal.find("input[name='roleName']").val(),
+                claims: selectedClaims
+            }),
+            success: function () {
+                $('#editRoleModal').modal('hide');
+                notify("", "Rol başarıyla güncellendi.", "success");
+                getRoles();
+            },
+            error: function (xhr, status, error) {
+                var errorMessage = xhr.responseJSON.ErrorMessage;
+                notify("", errorMessage, "error");
+            }
+
+        });
+    }
+</script>

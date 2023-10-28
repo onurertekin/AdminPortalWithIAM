@@ -1,0 +1,65 @@
+﻿@page "/categories"
+@model BlogAdminPortal.Pages.Categories.CategoriesModel
+
+<link rel="stylesheet" href="~/css/categories.css" />
+
+<div class="pageTitle">Kategoriler <button type="button" class="btn btn-primary new" data-toggle="modal" data-target="#newCategoryModal">Yeni Kategori Ekle</button></div>
+
+<div class="datatable">
+    <table id="categories" cellpadding="0" cellspacing="0" class="datatable">
+        <thead>
+            <tr>
+                <th>Adı</th>
+                <th style="width:75px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @*<tr>
+                <td>BMW</td>
+                <td>İ3</td>
+                <td>2000</td>
+                <td>34ASD123</td>
+                <td style="width:165px;">
+                    <button type="button" class="btn btn-primary">Düzenle</button>
+                    <button type="button" class="btn btn-primary">Sil</button>
+                </td>
+            </tr>
+            <tr>
+                <td>BMW</td>
+                <td>İ3</td>
+                <td>2000</td>
+                <td>34ASD123</td>
+                <td style="width:165px;">
+                    <button type="button" class="btn btn-primary">Düzenle</button>
+                    <button type="button" class="btn btn-primary">Sil</button>
+                </td>
+            </tr>
+            <tr>
+                <td>BMW</td>
+                <td>İ3</td>
+                <td>2000</td>
+                <td>34ASD123</td>
+                <td style="width:165px;">
+                    <button type="button" class="btn btn-primary">Düzenle</button>
+                    <button type="button" class="btn btn-primary">Sil</button>
+                </td>
+            </tr>*@
+        </tbody>
+    </table>
+</div>
+
+<template id="categoryTemplate">
+    <tr>
+        <td>#CategoryName#</td>
+        <td style="width:165px;">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editCategoryModal" data-id="#Id#">Düzenle</button>
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteCategoryModal" data-id="#Id#">Sil</button>
+        </td>
+    </tr>
+</template>
+
+<partial name="Partials/_New" />
+<partial name="Partials/_Edit"/>
+<partial name="Partials/_Delete"/>
+
+<script src="~/js/categories.js"></script>

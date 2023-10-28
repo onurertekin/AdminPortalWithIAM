@@ -1,0 +1,81 @@
+﻿<div class="modal fade" id="newContentModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Yeni Content</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label for="contentName">Adı</label>
+                    <input name="contentName" type="text" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="contentAuthor">Yazar</label>
+                    <input name="contentAuthor" type="text" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="contentDescription">Açıklama</label>
+                    <input name="contentDescription" type="text" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Kategori</label>
+                    <select name="category" class="form-control">
+                        @*<option value="1">C#</option>*@
+                    </select>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="createNewContent();">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $newContentModal = $("#newContentModal");
+    $('#newContentModal').on('shown.bs.modal', function () {
+
+        $newContentModal.find("input").val("");
+        $newContentModal.find("input[name='contentName']").trigger('focus');
+        fillCategories('#newContentModal select[name=category]');
+    });
+
+    function createNewContent() {
+        showModalLoading("newContentModal");
+        $.ajax({
+            url: portalApiEndpoint + '/geek-yapar-api/contents',
+            type: 'POST',
+            complete: function () {
+                hideModalLoading("newContentModal");
+            },
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                name: $newContentModal.find("input[name='contentName']").val(),
+                author: $newContentModal.find("input[name='contentAuthor']").val(),
+                description: $newContentModal.find("input[name='contentDescription']").val(),
+                categoryId: $newContentModal.find("select[name='category']").val()
+            }),
+            success: function () {
+                $('#newContentModal').modal('hide');
+                notify("", "İçerik başarıyla oluşturuldu.", "success");
+                getContents();
+            },
+            error: function (xhr, status, error) {
+                var errorMessage = xhr.responseJSON.ErrorMessage;
+                notify("", errorMessage, "error");
+            }
+
+        });
+    }
+
+</script>

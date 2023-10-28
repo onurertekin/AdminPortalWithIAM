@@ -1,0 +1,83 @@
+﻿<div class="modal fade" id="editCategoryModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Edit Category</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label for="categoryName">Kategori Adı</label>
+                    <input name="categoryName" type="text" class="form-control">
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="editCategory();">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $editCategoryModal = $("#editCategoryModal");
+    var selectedCategoryId;
+
+    $editCategoryModal.on('show.bs.modal', function (event) {
+        //Modal her açıldığında tetiklenir
+        showModalLoading("editCategoryModal");
+        $editCategoryModal.find("input[name='categoryName']").val("");
+        $editCategoryModal.find("input[name='categoryName']").trigger('focus');
+
+        selectedCategoryId = $(event.relatedTarget).data('id'); //Tıklanan satırın id'sini oku
+
+        getCategory();
+    });
+
+    function getCategory() {
+        $.ajax({
+            url: portalApiEndpoint + '/geek-yapar-api/categories/' + selectedCategoryId,
+            type: 'GET',
+            complete: function () {
+                hideModalLoading("editCategoryModal");
+            },
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                $editCategoryModal.find("input[name='categoryName']").val(response.name);
+            },
+            error: function (xhr, status, error) {
+                alert("Hata Oluştu!");
+            }
+        });
+    }
+
+    function editCategory() {
+        showModalLoading("editCategoryModal");
+        $.ajax({
+            url: portalApiEndpoint + '/geek-yapar-api/categories/' + selectedCategoryId,
+            type: 'PUT',
+            complete: function () {
+                hideModalLoading("editCategoryModal");
+            },
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                name: $editCategoryModal.find("input[name='categoryName']").val()
+            }),
+            success: function (result) {
+                $('#editCategoryModal').modal('hide');// modal'ı kapat
+                notify("", "Kategori başarıyla güncellendi.", "success");
+                getCategories();
+            },
+            error: function (xhr, status, error) {
+                var errorMessage = xhr.responseJSON.ErrorMessage;
+                notify("", errorMessage, "error");
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,109 @@
+﻿<div class="modal fade" id="editContentModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Edit Content</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label for="contentName">Adı</label>
+                    <input name="contentName" type="text" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="contentAuthor">Yazar</label>
+                    <input name="contentAuthor" type="text" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="contentDescription">Açıklama</label>
+                    <textarea name="contentDescription" type="text" class="form-control" rows="5"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Kategori</label>
+                    <select name="category" class="form-control">
+                        @*<option value="1">C#</option>*@
+                    </select>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="editContent();">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    $editContentModal = $("#editContentModal");
+    var selectedContentId;
+
+    $editContentModal.on('show.bs.modal', function (event) {
+        ////Modal her açıldığında tetiklenir
+        //$editContentModal.find("input").val("");
+        //$editContentModal.find("textarea").val("");
+        $editContentModal.find("input[name='contentName']").trigger('focus');
+
+        selectedContentId = $(event.relatedTarget).data('id');//Tıklanan satırın id'sini oku
+        getContent();
+        fillCategories('#editContentModal select[name=category]');
+
+    });
+
+    function editContent() {
+        showModalLoading("editContentModal");
+        $.ajax({
+            url: portalApiEndpoint + '/geek-yapar-api/contents/' + selectedContentId,
+            type: 'PUT',
+            complete: function () {
+                hideModalLoading("editContentModal");
+            },
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                name: $editContentModal.find("input[name='contentName']").val(),
+                author: $editContentModal.find("input[name='contentAuthor']").val(),
+                description: $editContentModal.find("textarea[name='contentDescription']").val(),
+                categoryId: $editContentModal.find("select[name='category']").val()
+            }),
+            success: function () {
+                $('#editContentModal').modal('hide');
+                notify("", "İçerik başarıyla güncellendi", "success");
+                getContents();
+            },
+            error: function (xhr, status, err) {
+                var errorMessage = xhr.responseJSON.ErrorMessage;
+                notify("", errorMessage, "error");
+            }
+        });
+    }
+
+    function getContent() {
+        showModalLoading("editContentModal");
+        $.ajax({
+            url: portalApiEndpoint + '/geek-yapar-api/contents/' + selectedContentId,
+            type: 'GET',
+            complete: function () {
+                hideModalLoading("editContentModal");
+            },
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                $editContentModal.find("input[name='contentName']").val(response.name);
+                $editContentModal.find("input[name='contentAuthor']").val(response.author);
+                $editContentModal.find("textarea[name='contentDescription']").val(response.description);
+                $editContentModal.find("select[name='category']").val(response.categoryId);
+            },
+            error: function (xhr, status, error) {
+                alert("Hata Oluştu!");
+            }
+        });
+    }
+
+</script>
